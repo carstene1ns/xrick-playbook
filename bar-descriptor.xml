@@ -50,6 +50,7 @@
     <asset path="assets">assets</asset>
     <asset path="data.zip">data.zip</asset>
     <asset path="icon.png">icon.png</asset>
+    <asset path="sdl-controls.xml">sdl-controls.xml</asset>
     <configuration id="com.qnx.qcc.configuration.exe.debug.1799447973" name="Device-Debug">
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="Device-Debug/xrick" entry="true" type="Qnx/Elf">xrick</asset>
