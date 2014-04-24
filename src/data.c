@@ -17,19 +17,25 @@
 #include "system.h"
 #include "data.h"
 
+#ifndef __QNXNTO__
 #include "unzip.h"
+#endif
 
 /*
  * Private typedefs
  */
+#ifndef __QNXNTO__
 typedef struct {
 	char *name;
 	unzFile zip;
 } zipped_t;
+#endif
 
 typedef struct {
 	char *name;
+#ifndef __QNXNTO__
 	unzFile zip;
+#endif
 } path_t;
 
 /*
@@ -40,7 +46,9 @@ static path_t path;
 /*
  * Prototypes
  */
+#ifndef __QNXNTO__
 static int str_zipext(char *);
+#endif
 static char *str_dup(char *);
 static char *str_slash(char *);
 
@@ -50,6 +58,7 @@ static char *str_slash(char *);
 void
 data_setpath(char *name)
 {
+#ifndef __QNXNTO__
 	unzFile zip;
 	char *n;
 
@@ -68,8 +77,11 @@ data_setpath(char *name)
 		/* path has no .zip extension. it should be a directory */
 		/* FIXME check that it is a valid directory */
 		path.zip = NULL;
+#endif
 		path.name = str_dup(name);
+#ifndef __QNXNTO__
 	}
+#endif
 }
 
 /*
@@ -78,10 +90,12 @@ data_setpath(char *name)
 void
 data_closepath()
 {
+#ifndef __QNXNTO__
 	if (path.zip) {
 		unzClose(path.zip);
 		path.zip = NULL;
 	}
+#endif
 	free(path.name);
 	path.name = NULL;
 }
@@ -94,6 +108,8 @@ data_file_open(char *name)
 {
 	char *n;
 	FILE *fh;
+
+#ifndef __QNXNTO__
 	zipped_t *z;
 
 	if (path.zip) {
@@ -106,7 +122,9 @@ data_file_open(char *name)
 			z = NULL;
 		}
 	    return (data_file_t *)z;
-	} else {
+	} else
+#endif
+	{
 		n = malloc(strlen(path.name) + strlen(name) + 2);
 		sprintf(n, "%s/%s", path.name, name);
 		str_slash(n);
@@ -119,9 +137,12 @@ int
 data_file_size(data_file_t *file)
 {
 	int s;
+#ifndef __QNXNTO__
 	if (path.zip) {
 		/* not implemented */
-	} else {
+	} else
+#endif
+	{
 		fseek((FILE *)file, 0, SEEK_END);
 		s = ftell((FILE *)file);
 		fseek((FILE *)file, 0, SEEK_SET);
@@ -135,10 +156,13 @@ data_file_size(data_file_t *file)
 int
 data_file_seek(data_file_t *file, long offset, int origin)
 {
+#ifndef __QNXNTO__
 	if (path.zip) {
 		/* not implemented */
 		return -1;
-	} else {
+	} else
+#endif
+	{
 		return fseek((FILE *)file, offset, origin);
 	}
 }
@@ -149,10 +173,13 @@ data_file_seek(data_file_t *file, long offset, int origin)
 int
 data_file_tell(data_file_t *file)
 {
+#ifndef __QNXNTO__
 	if (path.zip) {
 		/* not implemented */
 		return -1;
-	} else {
+	} else
+#endif
+	{
 		return ftell((FILE *)file);
 	}
 }
@@ -163,9 +190,12 @@ data_file_tell(data_file_t *file)
 int
 data_file_read(data_file_t *file, void *buf, size_t size, size_t count)
 {
+#ifndef __QNXNTO__
 	if (path.zip) {
 		return unzReadCurrentFile(((zipped_t *)file)->zip, buf, size * count) / size;
-	} else {
+	} else
+#endif
+	{
 		return fread(buf, size, count, (FILE *)file);
 	}
 }
@@ -176,16 +206,21 @@ data_file_read(data_file_t *file, void *buf, size_t size, size_t count)
 void
 data_file_close(data_file_t *file)
 {
+#ifndef __QNXNTO__
 	if (path.zip) {
 		unzClose(((zipped_t *)file)->zip);
 		((zipped_t *)file)->zip = NULL;
 		free(((zipped_t *)file)->name);
 		((zipped_t *)file)->name = NULL;
-	} else {
+	} else
+#endif
+	{
 		fclose((FILE *)file);
 	}
 }
 
+
+#ifndef __QNXNTO__
 /*
  * Returns 1 if filename has .zip extension.
  */
@@ -195,17 +230,18 @@ str_zipext(char *name)
 	int i;
 
 	i = strlen(name) - 1;
-	if (i < 0 || name[i] != 'p' && name[i] != 'P') return 0;
+	if (i < 0 || (name[i] != 'p' && name[i] != 'P')) return 0;
 	i--;
-	if (i < 0 || name[i] != 'i' && name[i] != 'I') return 0;
+	if (i < 0 || (name[i] != 'i' && name[i] != 'I')) return 0;
 	i--;
-	if (i < 0 || name[i] != 'z' && name[i] != 'Z') return 0;
+	if (i < 0 || (name[i] != 'z' && name[i] != 'Z')) return 0;
 	i--;
 	if (i < 0 || name[i] != '.') return 0;
 	i--;
 	if (i < 0) return 0;
 	return 1;
 }
+#endif
 
 /*
  *

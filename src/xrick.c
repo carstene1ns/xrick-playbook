@@ -23,10 +23,14 @@ int
 main(int argc, char *argv[])
 {
 	sys_init(argc, argv);
+#ifdef __QNXNTO__
+	data_setpath("app/native/assets");
+#else
 	if (sysarg_args_data)
 		data_setpath(sysarg_args_data);
 	else
 		data_setpath("data.zip");
+#endif
 	game_run();
 	data_closepath();
 	sys_shutdown();
